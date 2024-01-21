@@ -61,7 +61,6 @@ const Track: React.FC = () => {
     const screenWidth = getScalePos(imageSize.width)
     const screenHeight = getScalePos(imageSize.height)
 
-    console.log({ width, height })
     try {
       const stage = new Stage({
         worldWidth: WORLD_WIDTH,
@@ -241,12 +240,16 @@ const Track: React.FC = () => {
         laneConfList
       })
 
+
+      console.log('rate',  RATE * scale)
+      stage.addTicker(road.consume.bind(road))
+
       const mock = new Mock({
         laneList: [...road.laneMap.values()]
       })
 
-      mock.on((data:any) => {
-        console.log(data)
+      mock.on((data: any) => {
+        road.createAndUpdate(data)
       })
 
       setTimeout(() => {

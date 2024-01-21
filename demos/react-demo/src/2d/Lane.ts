@@ -22,4 +22,8 @@ export default class Lane {
     this.rate = rate
     this.centerLine = new LaneLine({conf: lineConf, rate})
   }
+
+  getPosByMeter (meter: number) {
+    return this.centerLine.getPosByMeter(meter)
+  }
 }

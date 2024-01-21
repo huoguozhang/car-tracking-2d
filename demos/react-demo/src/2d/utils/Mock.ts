@@ -9,23 +9,20 @@ const genId = () => {
   return _uid
 }
 
-// 每秒跑的距离 按 [20km - 60 km/h]
-const minSpeed = 5.56
-const maxSpeed = 16.67
+// 每秒跑的距离
+const minSpeed = 1
+const maxSpeed = 10
 
 const range = maxSpeed - minSpeed
 
 const getPerSDistance = () => {
-  return Math.floor(range * Math.random() + minSpeed)
+  return Number((range * Math.random() + minSpeed).toFixed(2))
 }
 
 interface IOps {
   laneList: Lane[]
   time?: number
 }
-
-
-
 
 export default class Mock {
   laneList: Lane[] = []
@@ -34,6 +31,7 @@ export default class Mock {
   time:number
   dataList: IDataItem[] = []
   cbList: Function[] = []
+  private _createLaneIndex = 0
 
   constructor({ laneList, time = 1000 }: IOps) {
     this.time = time
@@ -62,8 +60,13 @@ export default class Mock {
      clearInterval(this.clock)
   }
   getRandLane () {
-    const len = this.laneList.length
-    const index = Math.floor( Math.random() * len)
+   const index = this._createLaneIndex
+
+   this._createLaneIndex++
+
+   if (this._createLaneIndex === this.laneList.length){
+     this._createLaneIndex = 0
+   }
 
     return this.laneList[index]
   }

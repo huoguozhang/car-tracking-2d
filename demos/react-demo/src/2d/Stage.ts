@@ -8,7 +8,6 @@ interface IOps {
   worldHeight: number
   screenWidth: number
   screenHeight: number
-
 }
 
 export default class Stage {
@@ -64,7 +63,7 @@ export default class Stage {
     this.initEvents()
   }
 
-  get mountCt () {
+  get mountCt() {
     return this.ct
   }
 
@@ -88,25 +87,7 @@ export default class Stage {
     this.screenCt.addChild(s)
 
     s.zIndex = Z_INDEX_MAP.car
-
-    const car = Sprite.from('/car.svg')
-
-    car.zIndex = Z_INDEX_MAP.car +1
-
-    car.anchor.set(0.5,0.5)
-
-    car.rotation = Math.PI / 2
-
-    car.y = 320
-
-    car.width = 50
-    car.height = 80
-
-    car.x = 100
-
-    this.screenCt.addChild(car)
   }
-
 
   initWorld() {
     const g = new Graphics()
@@ -148,11 +129,18 @@ export default class Stage {
     this.app.stage.destroy()
     // this.app.destroy()
 
-
     this.eventCbs.forEach(({ unbindFn }) => unbindFn())
   }
-  
-  exportMount (cb: Function) {
-     cb(this.mount.bind(this))
+
+  addTicker(cb: Function) {
+    let last = Date.now()
+    this.app.ticker.add(() => {
+      const cur = Date.now()
+
+      cb(cur - last)
+
+      last = cur
+    })
   }
+  
 }

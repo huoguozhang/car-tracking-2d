@@ -5,8 +5,10 @@ export interface IPos {
   y: number
 }
 
+export type TUid = number
+
 export interface IState extends IPos {
-  radian: number
+  rotation: number
 }
 
 export interface IEventHandler {
