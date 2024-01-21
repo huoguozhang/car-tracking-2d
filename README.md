@@ -17,9 +17,11 @@
 
 ## 启动demo项目
 
-1 cd `car-tracking-2d/demos/react-demo`
-2 `yarn`
-3 `yarn start`
+1. cd `car-tracking-2d/demos/react-demo`
+
+2. `yarn`
+
+3. `yarn start`
 
 ## 界面使用
 
