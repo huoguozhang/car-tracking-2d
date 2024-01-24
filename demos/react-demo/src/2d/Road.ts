@@ -122,8 +122,6 @@ export default class Road {
 
         this.laneMap.set(lane.id, lane)
       })
-
-      console.log(...this.laneMap.values())
     } catch (e) {
       console.log('构建弯道失败', e)
     }

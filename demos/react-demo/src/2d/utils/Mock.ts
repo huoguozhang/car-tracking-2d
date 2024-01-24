@@ -68,8 +68,11 @@ export default class Mock {
     this.clock = setInterval(() => {
       this.updateDataItems()
 
-      const item = this.createDataItem()
-      this.dataList.push(item)
+      // 控制汽车的数量 不要太密集
+      if (Math.random() > 0.5){
+        const item = this.createDataItem()
+        this.dataList.push(item)
+      }
 
       this.runCb(this.dataList)
     }, this.time)
