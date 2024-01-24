@@ -10,7 +10,7 @@ const genId = () => {
 }
 
 // 每秒跑的距离
-const minSpeed = 1
+const minSpeed = 5
 const maxSpeed = 10
 
 const range = maxSpeed - minSpeed

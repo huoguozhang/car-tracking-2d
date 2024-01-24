@@ -1,6 +1,7 @@
 import { Container, Sprite, Text } from 'pixi.js'
 import { IState, TMountChild, TUid } from './utils/types'
 import { Z_INDEX_MAP } from './utils/const'
+import { DOUBLE_PI, PI } from './utils/helper'
 
 interface IOps extends IState {
   id: TUid
@@ -16,10 +17,15 @@ export const CAR_IMAGE_WIDTH = 7
 
 export const CAR_IMAGE_HEIGHT = 6
 
+const IN_CURVE_STATE = 1
+const NOT_CURVE_STATE = 0
 export default class Car {
   id: TUid
   usedTime = 0
   updating = false
+  rotation = 0
+
+  rotationChangeState = NOT_CURVE_STATE
 
   deltaState: IState = {
     x: 0,
@@ -49,9 +55,9 @@ export default class Car {
     this.carObj.height = height
 
     this.carObj.anchor.set(0.5, 0.5)
-    
+
     // 只需要车身旋转即可
-    this.carObj.rotation = rotation
+    this.updateRotation(rotation)
 
     this.carObj.zIndex = Z_INDEX_MAP.car
     this.textObj.zIndex = Z_INDEX_MAP.text
@@ -75,9 +81,10 @@ export default class Car {
   readyMove({ x, y, rotation }: IState) {
     this.usedTime = 0
     this.updating = true
+
     const { x: o_x, y: o_y } = this.pixiObj
 
-    const { rotation: o_rotation } = this.carObj
+    const o_rotation = this.rotation
 
     this.prevState = {
       x: o_x,
@@ -85,10 +92,24 @@ export default class Car {
       rotation: o_rotation
     }
 
+    let dRotation = rotation - o_rotation
+
+    // 应该旋转小角度
+    if (Math.abs(dRotation) > PI ) {
+       const temp_o = DOUBLE_PI - o_rotation
+       dRotation = rotation - temp_o
+
+       this.updateRotation(temp_o)
+       this.prevState.rotation = temp_o
+    } else if (Math.abs(dRotation) > PI /2) {
+      
+      //  dRotation = (PI - rotation) -o_rotation
+    }
+
     this.deltaState = {
       x: x - o_x,
       y: y - o_y,
-      rotation: o_rotation - rotation
+      rotation: dRotation
     }
   }
   // requestFrameAnimation的调度间隔
@@ -113,7 +134,8 @@ export default class Car {
 
       this.pixiObj.x = x
       this.pixiObj.y = y
-      this.carObj.rotation = rotation
+
+      this.updateRotation(rotation)
     }
   }
   destroy() {
@@ -121,11 +143,25 @@ export default class Car {
   }
 
   // 跑完最后的里程再消失
-  markRemove () {
+  markRemove() {
     this.willRemove = true
   }
 
   updateText(text: string) {
     this.textObj.text = text
+  }
+  updateRotation(rotation: number) {
+    this.rotation = rotation
+
+    this.carObj.rotation = rotation
+  }
+  changeRotationIfNeed(rotation: number, inCurve: boolean) {
+    if (this.rotationChangeState === NOT_CURVE_STATE && inCurve) {
+      this.rotationChangeState = IN_CURVE_STATE
+      // this.updateRotation(rotation)
+    } else if (this.rotationChangeState === IN_CURVE_STATE && !inCurve) {
+      this.rotationChangeState = NOT_CURVE_STATE
+      //  this.updateRotation(rotation)
+    }
   }
 }

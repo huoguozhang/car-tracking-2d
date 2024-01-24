@@ -1,14 +1,17 @@
 import { Container } from 'pixi.js'
 import {
+  ICircleInfo,
   IDataItem,
   ILaneLineConf,
   IPos,
   TLaneNo,
   TMountChild
 } from './utils/types'
-import Lane from './Lane'
+
 import Car, { CAR_IMAGE_WIDTH, CAR_IMAGE_HEIGHT } from './Car'
 import debuggerHelper from './utils/debuggerHelper'
+import { calculateCircleProperties } from './utils/helper'
+import Lane from './Lane'
 
 interface IOps {
   ct: Container
@@ -47,17 +50,76 @@ export default class Road {
 
   // 计算车道信息
   calcLane(laneConfList: IOps['laneConfList']) {
+    const circleInfoList: ICircleInfo[] = []
+
     laneConfList.forEach((list) => {
       const lane = new Lane({
         lineConf: list,
         rate: this.rate
       })
 
+      list.forEach((v) => {
+        if (v.circle) {
+          circleInfoList.push(v.circle)
+        }
+      })
+
       // 方便开发观察 绘制车道线 ---begin----
-      //   this.mount(lane.centerLine.paint())
+      // this.mount(lane.centerLine.paint())
+
+      // 绘制车道id
+
+      if (debuggerHelper.isDebug) {
+        this.mount(lane.paintInfo())
+      }
 
       this.laneMap.set(lane.id, lane)
     })
+
+    try {
+      const getIndexs = (s: string) => {
+        const [s1, s2] = s.split('-')
+
+        return [Number(s1) - 1, Number(s2) - 1]
+      }
+
+      // 构建弯道 车道
+      circleInfoList.forEach((cInfo) => {
+        const { id, linkId } = cInfo
+        let [laneIndex0, posIndex0] = getIndexs(id)
+        let [laneIndex1, posIndex1] = getIndexs(linkId)
+
+        const lane0 = laneConfList[laneIndex0]
+        const lane1 = laneConfList[laneIndex1]
+
+        const a = { ...lane0[posIndex0 - 1] }
+        const b = { ...lane0[posIndex0] }
+        const c = { ...lane1[posIndex1] }
+        const d = { ...lane1[posIndex1 + 1] }
+
+        const curveInfo = calculateCircleProperties(a, b, c, d)
+
+        b.curve = curveInfo
+
+        const lane = new Lane({
+          lineConf: [a, b, c, d],
+          rate: this.rate
+        })
+
+        lane.centerLine.curInfo = {
+          ...b.circle,
+          ...b.curve,
+          laneId: lane.id
+        }
+
+        // 方便开发观察 绘制车道线 ---begin----
+        // this.mount(lane.centerLine.paint())
+
+        this.laneMap.set(lane.id, lane)
+      })
+    } catch (e) {
+      console.log('构建弯道失败', e)
+    }
   }
 
   getPos(pos: IPos) {
@@ -118,6 +180,7 @@ export default class Road {
         this.addCar(car)
       } else {
         car.show()
+        car.changeRotationIfNeed(posState.rotation, !!posState.inCurve)
         car.readyMove(posState)
 
         // debug 文本
@@ -127,7 +190,8 @@ export default class Road {
               `${meter.toFixed(2)}m`,
               `id:${id}`,
               `lane:${laneNo}`,
-              `pos:[${posState.x},${posState.y}]`
+              `pos:[${posState.x},${posState.y}]`,
+              `rotation:${posState.rotation}`
             ].join('\n')
           )
         }
@@ -141,7 +205,7 @@ export default class Road {
       if (car.willRemove && !car.updating) {
         this.removeCar(car)
       } else {
-        car.consume(deltaMs)
+        car.consume.call(car, deltaMs)
       }
     }
   }

@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/huoguozhang/car-tracking-2d/issues"
   },
-  "homepage": "https://github.com/huoguozhang/car-tracking-2d#readme"
+  "homepage": "https://github.com/huoguozhang/car-tracking-2d#readme",
+  "devDependencies": {
+    "prettier": "^3.2.4"
+  }
 }

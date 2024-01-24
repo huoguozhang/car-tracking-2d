@@ -1,11 +1,14 @@
 import LaneLine from './LaneLine'
-import {ILaneLineConf} from './utils/types'
+import { Z_INDEX_MAP } from './utils/const'
+import { ILaneLineConf } from './utils/types'
+import { Container, Graphics, Text } from 'pixi.js'
+
 // 车道
 let _id = 0
 
 const genId = () => {
-    _id++
-    return _id
+  _id++
+  return _id
 }
 
 interface IOps {
@@ -15,15 +18,44 @@ interface IOps {
 
 export default class Lane {
   id = genId()
-  rate:number
+  rate: number
   centerLine: LaneLine
 
-  constructor ({lineConf, rate}: IOps) {
+  constructor({ lineConf, rate }: IOps) {
     this.rate = rate
-    this.centerLine = new LaneLine({conf: lineConf, rate})
+    this.centerLine = new LaneLine({ conf: lineConf, rate })
   }
 
-  getPosByMeter (meter: number) {
+  getPosByMeter(meter: number) {
     return this.centerLine.getPosByMeter(meter)
+  }
+  paintInfo() {
+    const c = new Container()
+
+    const g = new Graphics()
+
+    g.beginFill(0x0000ff)
+
+    const width = 20
+    g.drawRect(0, 0, width, width)
+    g.endFill()
+
+    const text = new Text(`${this.id}`, {
+      fill: 0xffffff,
+      fontSize: 16
+    })
+
+    c.addChild(g)
+    c.addChild(text)
+
+    const l = this.centerLine
+
+    const pos = l.getPosByMeter(l.posList[1].meter / 4)
+
+    c.x = pos.x - width / 2
+    c.y = pos.y - width / 2
+
+    c.zIndex = Z_INDEX_MAP.lane
+    return c
   }
 }

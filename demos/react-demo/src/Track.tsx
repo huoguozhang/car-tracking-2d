@@ -79,7 +79,12 @@ const Track: React.FC = () => {
           },
           {
             x: 1072,
-            y: 1605
+            y: 1605,
+            circle: {
+              // 编号形式 车道序号-第几个点 
+              id: '1-2',
+              linkId: '7-3'
+            }
           },
           {
             x: 1072,
@@ -98,7 +103,12 @@ const Track: React.FC = () => {
           },
           {
             x: 1198,
-            y: 1605
+            y: 1605,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '2-2',
+              linkId: '6-3'
+            }
           },
           {
             x: 1198,
@@ -117,7 +127,12 @@ const Track: React.FC = () => {
           },
           {
             x: 926,
-            y: 396
+            y: 396,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '3-2',
+              linkId: '5-3'
+            }
           },
           {
             x: 926,
@@ -136,7 +151,12 @@ const Track: React.FC = () => {
           },
           {
             x: 800,
-            y: 396
+            y: 396,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '4-2',
+              linkId: '8-3'
+            }
           },
           {
             x: 800,
@@ -154,11 +174,16 @@ const Track: React.FC = () => {
             y: 1075
           },
           {
-            x: 495,
-            y: 1075
+            x: 395,
+            y: 1075,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '5-2',
+              linkId: '1-3'
+            }
           },
           {
-            x: 1065,
+            x: 1604,
             y: 1075
           },
           {
@@ -173,11 +198,16 @@ const Track: React.FC = () => {
             y: 1201
           },
           {
-            x: 495,
-            y: 1201
+            x: 395,
+            y: 1201,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '6-2',
+              linkId: '4-3'
+            }
           },
           {
-            x: 1065,
+            x: 1604,
             y: 1201
           },
           {
@@ -192,11 +222,16 @@ const Track: React.FC = () => {
             y: 923
           },
           {
-            x: 1065,
-            y: 923
+            x: 1604,
+            y: 923,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '7-2',
+              linkId: '3-3'
+            }
           },
           {
-            x: 495,
+            x: 395,
             y: 923
           },
           {
@@ -211,11 +246,16 @@ const Track: React.FC = () => {
             y: 798
           },
           {
-            x: 1065,
-            y: 798
+            x: 1604,
+            y: 798,
+            circle: {
+              // 编号形式 车道序号-第几个点
+              id: '8-2',
+              linkId: '2-3'
+            }
           },
           {
-            x: 495,
+            x: 395,
             y: 798
           },
           {
@@ -240,10 +280,9 @@ const Track: React.FC = () => {
         laneConfList
       })
 
-
-      console.log('rate',  RATE * scale)
       stage.addTicker(road.consume.bind(road))
 
+     
       const mock = new Mock({
         laneList: [...road.laneMap.values()]
       })
@@ -266,6 +305,7 @@ const Track: React.FC = () => {
 
   return (
     <div
+      id='test'
       style={{
         height: '100vh',
         width: '100%',
