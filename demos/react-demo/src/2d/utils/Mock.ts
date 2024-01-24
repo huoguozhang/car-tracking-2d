@@ -1,5 +1,5 @@
 import Lane from '../Lane'
-import {IDataItem} from './types'
+import { IDataItem } from './types'
 
 let _uid = 0
 
@@ -24,83 +24,118 @@ interface IOps {
   time?: number
 }
 
+class DataItem  {
+  data: IDataItem
+   constructor(ops: IDataItem){
+     this.data = {...ops}
+   }
+   pause(){
+    this.data.paused = true
+   }
+   unPause(){
+    this.data.paused = false
+   }
+   getData () {
+    return this.data
+   }
+}
+
 export default class Mock {
   laneList: Lane[] = []
   laneMap = new Map<Lane['id'], Lane>()
   clock: any
-  time:number
+  time: number
   dataList: IDataItem[] = []
   cbList: Function[] = []
   // 可能变道的概率是多少
-  maybeChangeLane = 0.5
+  maybeChangeLane = 0.1
   private _createLaneIndex = 0
 
-  
   constructor({ laneList, time = 1000 }: IOps) {
     this.time = time
     this.laneList = laneList
-    this.laneMap = new Map(laneList.map(l => [l.id, l]))
+    this.laneMap = new Map(laneList.map((l) => [l.id, l]))
 
     this.autoRun()
   }
-  on (cb: Function) {
+  on(cb: Function) {
     this.cbList.push(cb)
   }
   runCb(list: IDataItem[]) {
-    this.cbList.forEach(cb => cb(list))
+    this.cbList.forEach((cb) => cb(list))
   }
-  autoRun () {
+  autoRun() {
     this.clock = setInterval(() => {
-        this.updateDataItems()
+      this.updateDataItems()
 
-        const item = this.createDataItem()
-        this.dataList.push(item)
+      const item = this.createDataItem()
+      this.dataList.push(item)
 
-        this.runCb(this.dataList)
+      this.runCb(this.dataList)
     }, this.time)
   }
-  destroy (){
-     clearInterval(this.clock)
+  destroy() {
+    clearInterval(this.clock)
   }
-  getRandLane () {
-   const index = this._createLaneIndex
+  getRandLane() {
+    const index = this._createLaneIndex
 
-   this._createLaneIndex++
+    this._createLaneIndex++
 
-   if (this._createLaneIndex === this.laneList.length){
-     this._createLaneIndex = 0
-   }
+    if (this._createLaneIndex === this.laneList.length) {
+      this._createLaneIndex = 0
+    }
 
     return this.laneList[index]
   }
-  createDataItem (): IDataItem {
+  createDataItem(): IDataItem {
     return {
-        id: genId(),
-        meter: 0,
-        laneNo: this.getRandLane()?.id || 0,
-        leave: false
+      id: genId(),
+      meter: 0,
+      laneNo: this.getRandLane()?.id || 0,
+      leave: false,
+      paused: false
     }
   }
 
-  updateDataItems () {
-    this.dataList = this.dataList.filter(data => !data.leave)
+  updateDataItems() {
+    this.dataList = this.dataList
+      .filter((data) => !data.leave)
 
-    this.dataList.forEach(data => {
-        const distance = getPerSDistance()
+    this.dataList.forEach((data) => {
+      // 暂停了就跳过 防止碰撞
+      if (data.paused) {
+        data.paused = false
+        return
+      }
+      const distance = getPerSDistance()
 
-        const lane = this.laneMap.get(data.laneNo)
+      let lane = this.laneMap.get(data.laneNo)
 
-        const res = distance + data.meter
+      const changeLane = lane?.centerLine.canChangeLane(data.meter)
 
-        if (lane && res >= lane?.centerLine.totalMeter){
-            data.leave = true
-            data.meter = lane.centerLine.totalMeter
-        } else{
-            data.meter = res
+      if (changeLane) {
+        const len = changeLane.length
+        const index = Math.floor(Math.random() * len)
+
+        const newLane = this.laneMap.get(changeLane[index])
+
+        if (newLane) {
+          lane = newLane
         }
+      }
+
+      const res = distance + data.meter
+
+      if (lane && res >= lane?.centerLine.totalMeter) {
+        data.leave = true
+        data.meter = lane.centerLine.totalMeter
+      } else {
+        data.meter = res
+      }
     })
   }
-  doChangeLane () {
+  doChangeLane() {
     return Math.random() < this.maybeChangeLane
   }
 }

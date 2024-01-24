@@ -10,7 +10,7 @@ import {
 
 import Car, { CAR_IMAGE_WIDTH, CAR_IMAGE_HEIGHT } from './Car'
 import debuggerHelper from './utils/debuggerHelper'
-import { calculateCircleProperties } from './utils/helper'
+import { calculateCircleProperties, doIntersect } from './utils/helper'
 import Lane from './Lane'
 
 interface IOps {
@@ -50,7 +50,7 @@ export default class Road {
 
   // 计算车道信息
   calcLane(laneConfList: IOps['laneConfList']) {
-    const circleInfoList: (ICircleInfo & {uid: string})[] = []
+    const circleInfoList: (ICircleInfo & { uid: string })[] = []
 
     laneConfList.forEach((list, index) => {
       const [laneUid] = list[0]?.uid.split('-')
@@ -63,7 +63,7 @@ export default class Road {
 
       list.forEach((v) => {
         if (v.circle) {
-          circleInfoList.push({...v.circle, uid: v.uid})
+          circleInfoList.push({ ...v.circle, uid: v.uid })
         }
       })
 
@@ -155,6 +155,9 @@ export default class Road {
   }
 
   createAndUpdate(dataList: IDataItem[]) {
+    // 已经存在的线段
+    const lineList: IPos[][] = []
+
     dataList.forEach((data) => {
       const { id, meter, laneNo, leave } = data
 
@@ -187,6 +190,27 @@ export default class Road {
         this.addCar(car)
       } else {
         car.show()
+        // 碰撞检测
+        const linePos: IPos[] = [
+          { x: car.x, y: car.y },
+          {
+            x: posState.x,
+            y: posState.y
+          }
+        ]
+
+        if (
+          lineList.some((line) =>
+            doIntersect(linePos[0], linePos[1], line[0], line[1])
+          )
+        ) {
+          // 会碰上
+          data.paused = true
+          return
+        }
+
+        lineList.push(linePos)
+
         car.changeRotationIfNeed(posState.rotation, !!posState.inCurve)
         car.readyMove(posState)
 

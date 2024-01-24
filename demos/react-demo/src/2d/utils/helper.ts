@@ -154,3 +154,40 @@ export function getAngle(dy: number, dx: number) {
 
   return angle
 }
+
+function crossProduct(point1: IPos, point2: IPos) {
+  return point1.x * point2.y - point1.y * point2.x
+}
+
+function onSegment(p: IPos, q: IPos, r: IPos) {
+  return (
+    q.x <= Math.max(p.x, r.x) &&
+    q.x >= Math.min(p.x, r.x) &&
+    q.y <= Math.max(p.y, r.y) &&
+    q.y >= Math.min(p.y, r.y)
+  )
+}
+
+function orientation(p: IPos, q: IPos, r: IPos) {
+  const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+  if (val === 0) return 0 // 共线
+  return val > 0 ? 1 : 2 // 顺时针或逆时针
+}
+
+export function doIntersect(A: IPos, B: IPos, C: IPos, D: IPos) {
+  const o1 = orientation(A, B, C)
+  const o2 = orientation(A, B, D)
+  const o3 = orientation(C, D, A)
+  const o4 = orientation(C, D, B)
+
+  if (o1 !== o2 && o3 !== o4) {
+    return true // 线段相交
+  }
+
+  if (o1 === 0 && onSegment(A, C, B)) return true // ABC 共线
+  if (o2 === 0 && onSegment(A, D, B)) return true // ABD 共线
+  if (o3 === 0 && onSegment(C, A, D)) return true // CAD 共线
+  if (o4 === 0 && onSegment(C, B, D)) return true // CBD 共线
+
+  return false
+}

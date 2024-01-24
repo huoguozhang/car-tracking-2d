@@ -164,4 +164,10 @@ export default class Car {
       //  this.updateRotation(rotation)
     }
   }
+  get x () {
+    return this.pixiObj.x
+  }
+  get y () {
+    return this.pixiObj.y
+  }
 }

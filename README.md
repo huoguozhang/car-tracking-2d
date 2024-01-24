@@ -13,7 +13,7 @@
 <video controls width="640" height="360" src="./docs/result.mov">
 </video>
 
-[文件链接](https://github.com/huoguozhang/car-tracking-2d/blob/b0fd02763ec54010d09c8d2f86954c526f0f6794/docs/result.mov)
+[文件链接](https://github.com/huoguozhang/car-tracking-2d/blob/main/docs/result.mov)
 
 ## 启动demo项目
 

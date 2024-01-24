@@ -69,5 +69,7 @@ export interface IDataItem {
   laneNo: number
   id: number
   leave: boolean
+  // 是否停止
+  paused: boolean
 }
 export type TLaneNo = number
