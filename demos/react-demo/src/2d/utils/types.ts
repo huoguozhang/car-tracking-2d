@@ -5,7 +5,9 @@ export interface IPos {
   y: number
 }
 
-export type TUid = number
+export type TId = number
+
+export type TUid = string
 
 export interface IState extends IPos {
   rotation: number
@@ -22,7 +24,6 @@ export interface IEventHandler {
 export type TMountChild = Sprite | Text | Container | Graphics
 
 export interface ICircleInfo {
-  id: string
   linkId: string
 }
 
@@ -42,6 +43,11 @@ export interface ILaneLineConf extends IPos {
   circle?: ICircleInfo
   // 我们计算出来的曲线信息
   curve?: ICurveInfo
+  // 变道信息 能变到哪些车道
+  uid: string
+  changeLane?: {
+    lanes: number[]
+  }
 }
 
 export interface ILinePos extends IPos {
@@ -53,6 +59,9 @@ export interface ILinePos extends IPos {
   // 实际上表示 道路的里程
   meter: number
   curve?: ICurveInfo
+  changeLane?: {
+    lanes: number[]
+  }
 }
 
 export interface IDataItem {

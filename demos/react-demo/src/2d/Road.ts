@@ -50,17 +50,20 @@ export default class Road {
 
   // 计算车道信息
   calcLane(laneConfList: IOps['laneConfList']) {
-    const circleInfoList: ICircleInfo[] = []
+    const circleInfoList: (ICircleInfo & {uid: string})[] = []
 
-    laneConfList.forEach((list) => {
+    laneConfList.forEach((list, index) => {
+      const [laneUid] = list[0]?.uid.split('-')
+
       const lane = new Lane({
         lineConf: list,
-        rate: this.rate
+        rate: this.rate,
+        uid: laneUid
       })
 
       list.forEach((v) => {
         if (v.circle) {
-          circleInfoList.push(v.circle)
+          circleInfoList.push({...v.circle, uid: v.uid})
         }
       })
 
@@ -85,8 +88,8 @@ export default class Road {
 
       // 构建弯道 车道
       circleInfoList.forEach((cInfo) => {
-        const { id, linkId } = cInfo
-        let [laneIndex0, posIndex0] = getIndexs(id)
+        const { uid, linkId } = cInfo
+        let [laneIndex0, posIndex0] = getIndexs(uid)
         let [laneIndex1, posIndex1] = getIndexs(linkId)
 
         const lane0 = laneConfList[laneIndex0]
@@ -103,7 +106,9 @@ export default class Road {
 
         const lane = new Lane({
           lineConf: [a, b, c, d],
-          rate: this.rate
+          rate: this.rate,
+          // 组合的uid
+          uid: `${a.uid}&${c.uid}`
         })
 
         lane.centerLine.curInfo = {
@@ -117,6 +122,8 @@ export default class Road {
 
         this.laneMap.set(lane.id, lane)
       })
+
+      console.log(...this.laneMap.values())
     } catch (e) {
       console.log('构建弯道失败', e)
     }

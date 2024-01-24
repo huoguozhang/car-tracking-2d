@@ -1,6 +1,6 @@
 // 车道线
 import { Graphics } from 'pixi.js'
-import { ILaneLineConf, ILinePos, IState } from './utils/types'
+import { ILaneLineConf, ILinePos, IState, TUid } from './utils/types'
 import {
 
   PI,
@@ -13,9 +13,11 @@ const VALID_LEN = 4
 interface IOps {
   conf: ILaneLineConf[]
   rate: number
+  uid: TUid
 }
 
 export default class LaneLine {
+  uid: TUid
   // 四个点 起点 中心的终点 中心起点（中心两个点为转弯的情况）  终点
   posList: ILinePos[] = []
   rate: number
@@ -23,8 +25,12 @@ export default class LaneLine {
   hasCurve = false
   // debug使用
   curInfo: any
-  constructor({ conf, rate }: IOps) {
+  // 在这个范围内的里程才可以变道
+  changeLaneMeterRange = [0,0]
+  changeLanes :number[]= []
+  constructor({ conf, rate, uid }: IOps) {
     this.rate = rate
+    this.uid = uid
 
     this.calcPos(conf)
 
@@ -81,6 +87,16 @@ export default class LaneLine {
 
     if (last) {
       this.totalMeter = last.meter
+    }
+
+    const index = this.posList.findIndex(v => v.changeLane)
+    
+    const changPos = this.posList[index]
+    const nextPos = this.posList[index+1]
+
+    if (changPos && nextPos) {
+      this.changeLaneMeterRange = [changPos.meter, nextPos.meter]
+      if (changPos.changeLane) this.changeLanes =changPos.changeLane.lanes
     }
   }
   get isValid() {
@@ -244,4 +260,14 @@ export default class LaneLine {
 
     return rotation
   }
+  canChangeLane (meter: number) {
+    const [start, end] = this.changeLaneMeterRange
+    
+    if (meter > start && meter < end) {
+      return this.changeLanes
+
+    } else{
+      return null
+    }
+  } 
 }

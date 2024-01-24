@@ -126,8 +126,14 @@ export default class Stage {
   }
 
   destroy() {
-    this.app.stage.destroy()
-    // this.app.destroy()
+  
+    try {
+      this.app.stage.destroy()
+      this.app.ticker.destroy()
+    } catch (error) {
+      console.log(error)
+    }
+   
 
     this.eventCbs.forEach(({ unbindFn }) => unbindFn())
   }
@@ -137,10 +143,13 @@ export default class Stage {
     this.app.ticker.add(() => {
       const cur = Date.now()
 
-      cb(cur - last)
+      try {
+        cb(cur - last)
+      } catch (e) {
+        console.log(e)
+      }
 
       last = cur
     })
   }
-  
 }

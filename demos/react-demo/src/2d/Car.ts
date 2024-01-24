@@ -1,10 +1,10 @@
 import { Container, Sprite, Text } from 'pixi.js'
-import { IState, TMountChild, TUid } from './utils/types'
+import { IState, TMountChild, TId } from './utils/types'
 import { Z_INDEX_MAP } from './utils/const'
 import { DOUBLE_PI, PI } from './utils/helper'
 
 interface IOps extends IState {
-  id: TUid
+  id: TId
   width: number
   height: number
 }
@@ -20,7 +20,7 @@ export const CAR_IMAGE_HEIGHT = 6
 const IN_CURVE_STATE = 1
 const NOT_CURVE_STATE = 0
 export default class Car {
-  id: TUid
+  id: TId
   usedTime = 0
   updating = false
   rotation = 0

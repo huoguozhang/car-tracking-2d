@@ -1,6 +1,6 @@
 import LaneLine from './LaneLine'
 import { Z_INDEX_MAP } from './utils/const'
-import { ILaneLineConf } from './utils/types'
+import { ILaneLineConf, TUid } from './utils/types'
 import { Container, Graphics, Text } from 'pixi.js'
 
 // 车道
@@ -14,16 +14,19 @@ const genId = () => {
 interface IOps {
   lineConf: ILaneLineConf[]
   rate: number
+  uid: TUid
 }
 
 export default class Lane {
   id = genId()
   rate: number
   centerLine: LaneLine
+  uid: TUid
 
-  constructor({ lineConf, rate }: IOps) {
+  constructor({ lineConf, rate, uid }: IOps) {
+    this.uid = uid
     this.rate = rate
-    this.centerLine = new LaneLine({ conf: lineConf, rate })
+    this.centerLine = new LaneLine({ conf: lineConf, rate, uid })
   }
 
   getPosByMeter(meter: number) {

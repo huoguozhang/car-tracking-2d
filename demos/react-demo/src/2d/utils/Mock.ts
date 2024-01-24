@@ -31,8 +31,11 @@ export default class Mock {
   time:number
   dataList: IDataItem[] = []
   cbList: Function[] = []
+  // 可能变道的概率是多少
+  maybeChangeLane = 0.5
   private _createLaneIndex = 0
 
+  
   constructor({ laneList, time = 1000 }: IOps) {
     this.time = time
     this.laneList = laneList
@@ -96,5 +99,8 @@ export default class Mock {
             data.meter = res
         }
     })
+  }
+  doChangeLane () {
+    return Math.random() < this.maybeChangeLane
   }
 }
